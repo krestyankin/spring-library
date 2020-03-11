@@ -31,7 +31,7 @@ public class AuthorDaoJdbc implements AuthorDao {
     @Override
     public Author getById(long id) {
         Map<String, Object> params = Collections.singletonMap("id", id);
-        return jdbc.queryForObject("select * from authors where id=:id", params, new AuthorMapper());
+        return jdbc.queryForObject("select id, fullname, dob from authors where id=:id", params, new AuthorMapper());
     }
 
     @Override
