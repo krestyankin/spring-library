@@ -1,9 +1,9 @@
 DROP TABLE IF EXISTS BOOKS;
-CREATE TABLE BOOKS(ID          BIGINT PRIMARY KEY,
+CREATE TABLE BOOKS(ID          bigserial,
                    TITLE       VARCHAR(255));
 
 DROP TABLE IF EXISTS AUTHORS;
-CREATE TABLE AUTHORS(ID        BIGINT PRIMARY KEY,
+CREATE TABLE AUTHORS(ID        bigserial,
                      FULLNAME  VARCHAR(255),
                      DOB       DATE
                      );
@@ -13,7 +13,7 @@ CREATE TABLE BOOKS_AUTHORS(BOOK_ID     BIGINT,
                            AUTHOR_ID   BIGINT);
 
 DROP TABLE IF EXISTS GENRES;
-CREATE TABLE GENRES(ID         BIGINT PRIMARY KEY,
+CREATE TABLE GENRES(ID         bigserial,
                     NAME       VARCHAR(255));
 
 DROP TABLE IF EXISTS BOOKS_GENRES;
@@ -21,3 +21,7 @@ CREATE TABLE BOOKS_GENRES(BOOK_ID     BIGINT,
                           GENRE_ID    BIGINT);
 
 
+DROP TABLE IF EXISTS COMMENTS;
+CREATE TABLE COMMENTS(ID          bigserial,
+                      BOOK_ID     bigint references books(id) on delete cascade,
+                      TEXT        VARCHAR(255));
