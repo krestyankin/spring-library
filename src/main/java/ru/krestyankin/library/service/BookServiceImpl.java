@@ -40,6 +40,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @ShellMethod(value = "Add book", key = {"add book", "ba"})
+    @Transactional
     public void add() {
         System.out.println("Добавление книги");
         Book book = new Book();
@@ -54,6 +55,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @ShellMethod(value = "Edit book", key = {"edit book", "be"})
+    @Transactional
     public void update(long bookId) {
         System.out.println("Редактирование книги");
         Book book = bookRepositoryJpa.findById(bookId).orElseThrow(IllegalArgumentException::new);
@@ -68,6 +70,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @ShellMethod(value = "Delete book", key = {"delete book", "bd"})
+    @Transactional
     public void delete(long bookId) {
         bookRepositoryJpa.deleteById(bookId);
     }
@@ -79,7 +82,7 @@ public class BookServiceImpl implements BookService {
         System.out.println("Добавление комментария");
         Book book = bookRepositoryJpa.findById(bookId).orElseThrow(IllegalArgumentException::new);
         Comment comment = new Comment();
-        comment.setBookId(bookId);
+        comment.setBook(book);
         System.out.print("Текст: ");
         comment.setText(in.nextLine());
         book.getComments().add(comment);
@@ -107,9 +110,18 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @ShellMethod(value = "Find books by title", key = {"find books", "bf"})
+    @ShellMethod(value = "Find books by title", key = {"find books by title", "bft"})
     public void findByTitle(String title) {
         System.out.println("Поиск книги "+title);
         System.out.println(bookRepositoryJpa.findByTitle(title));
+    }
+
+    @Override
+    @ShellMethod(value = "Find books by author", key = {"find books by author", "bfa"})
+    public void findByAuthor() {
+        System.out.println("Поиск книги по автору");
+        authorRepositoryJpa.findAll().forEach(author -> System.out.println(author));
+        System.out.print("ИД автора: ");
+        System.out.println(bookRepositoryJpa.findByAuthor(authorRepositoryJpa.findById(Long.parseLong(in.nextLine())).get()));
     }
 }

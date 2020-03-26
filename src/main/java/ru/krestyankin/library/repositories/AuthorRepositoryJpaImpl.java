@@ -1,18 +1,15 @@
 package ru.krestyankin.library.repositories;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.krestyankin.library.models.Author;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
 public class AuthorRepositoryJpaImpl implements AuthorRepositoryJpa {
     @PersistenceContext
     private EntityManager em;
@@ -47,9 +44,7 @@ public class AuthorRepositoryJpaImpl implements AuthorRepositoryJpa {
 
     @Override
     public void deleteById(long id) {
-        Query query = em.createQuery("delete from Author where id=:id");
-        query.setParameter("id", id);
-        query.executeUpdate();
+        em.remove(em.find(Author.class, id));
     }
 
     @Override

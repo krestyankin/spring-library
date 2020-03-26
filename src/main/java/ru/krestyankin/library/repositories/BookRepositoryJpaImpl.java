@@ -1,18 +1,16 @@
 package ru.krestyankin.library.repositories;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import ru.krestyankin.library.models.Author;
 import ru.krestyankin.library.models.Book;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
 public class BookRepositoryJpaImpl implements BookRepositoryJpa {
     @PersistenceContext
     private EntityManager em;
@@ -47,10 +45,16 @@ public class BookRepositoryJpaImpl implements BookRepositoryJpa {
     }
 
     @Override
+    public List<Book> findByAuthor(Author author) {
+        TypedQuery<Book> query = em.createQuery("select distinct b from Book b join fetch b.authors a join fetch b.genres " +
+                "where b.id in (select b2.id from Book b2 join b2.authors a2 where a2.id=:author)", Book.class);
+        query.setParameter("author", author.getId());
+        return query.getResultList();
+    }
+
+    @Override
     public void deleteById(long id) {
-        Query query = em.createQuery("delete from Book where id=:id");
-        query.setParameter("id", id);
-        query.executeUpdate();
+        em.remove(em.find(Book.class, id));
     }
 
     @Override

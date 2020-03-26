@@ -9,4 +9,5 @@ public interface BookService {
     void deleteComment(long bookId);
     void all();
     void findByTitle(String title);
+    void findByAuthor();
 }

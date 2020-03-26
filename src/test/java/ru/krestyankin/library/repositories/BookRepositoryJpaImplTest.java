@@ -80,4 +80,10 @@ class BookRepositoryJpaImplTest {
     void count() {
         assertThat(repositoryJpa.count()).isEqualTo(EXPECTED_NUMBER_OF_BOOKS);
     }
+
+    @Test
+    void findByAuthor() {
+        List<Book> books = repositoryJpa.findByAuthor(new Author(3,"Author 3", new Date()));
+        assertThat(books).isNotNull().hasSize(1).allMatch(book-> book.getAuthors()!=null && book.getAuthors().size()==2);
+    }
 }
