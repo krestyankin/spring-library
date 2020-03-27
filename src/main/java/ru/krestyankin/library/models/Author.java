@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +22,16 @@ public class Author {
     private String fullname;
     @Column(name = "dob", nullable = true, unique = false)
     private Date dateOfBirth;
+
+    @ManyToMany(mappedBy = "authors")
+    private List<Book> books;
+
+    @Override
+    public String toString() {
+        return "Author{" +
+                "id=" + id +
+                ", fullname='" + fullname + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                '}';
+    }
 }

@@ -46,10 +46,7 @@ public class BookRepositoryJpaImpl implements BookRepositoryJpa {
 
     @Override
     public List<Book> findByAuthor(Author author) {
-        TypedQuery<Book> query = em.createQuery("select distinct b from Book b join fetch b.authors a join fetch b.genres " +
-                "where b.id in (select b2.id from Book b2 join b2.authors a2 where a2.id=:author)", Book.class);
-        query.setParameter("author", author.getId());
-        return query.getResultList();
+        return author.getBooks();
     }
 
     @Override

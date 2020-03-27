@@ -4,19 +4,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import ru.krestyankin.library.models.Author;
 import ru.krestyankin.library.models.Book;
 import ru.krestyankin.library.models.Genre;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@Import({BookRepositoryJpaImpl.class, AuthorRepositoryJpaImpl.class, GenreRepositoryJpaImpl.class})
+@Import({BookRepositoryJpaImpl.class, AuthorRepositoryJpaImpl.class})
 class BookRepositoryJpaImplTest {
     private static final int EXPECTED_NUMBER_OF_BOOKS=3;
     private static final long BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS = 3;
@@ -28,12 +26,15 @@ class BookRepositoryJpaImplTest {
     @Autowired
     private BookRepositoryJpa repositoryJpa;
 
+    @Autowired
+    private AuthorRepositoryJpa authorRepositoryJpa;
+
     @Test
     void save() {
         long count = repositoryJpa.count();
         Book book = new Book();
         book.setTitle(BOOK_TITLE);
-        book.setAuthors(Collections.singleton(new Author(1,"Author 1", new Date())));
+        book.setAuthors(Collections.singleton(authorRepositoryJpa.findById(1).get()));
         book.setGenres(Collections.singleton(new Genre(1, "genre 1")));
         repositoryJpa.save(book);
         assertEquals(count+1, repositoryJpa.count());
@@ -83,7 +84,7 @@ class BookRepositoryJpaImplTest {
 
     @Test
     void findByAuthor() {
-        List<Book> books = repositoryJpa.findByAuthor(new Author(3,"Author 3", new Date()));
+        List<Book> books = repositoryJpa.findByAuthor(authorRepositoryJpa.findById(3).get());
         assertThat(books).isNotNull().hasSize(1).allMatch(book-> book.getAuthors()!=null && book.getAuthors().size()==2);
     }
 }

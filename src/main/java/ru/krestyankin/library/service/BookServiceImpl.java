@@ -118,6 +118,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @ShellMethod(value = "Find books by author", key = {"find books by author", "bfa"})
+    @Transactional
     public void findByAuthor() {
         System.out.println("Поиск книги по автору");
         authorRepositoryJpa.findAll().forEach(author -> System.out.println(author));
