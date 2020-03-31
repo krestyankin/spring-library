@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-class AuthorRepositoryJpaImplTest {
+class AuthorRepositoryImplTest {
     private static final long AUTHOR_ID = 1;
     private static final String AUTHOR_NAME = "Author 1";
     private static final long AUTHOR_ID_NEW = 5;
