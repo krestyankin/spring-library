@@ -3,6 +3,7 @@ package ru.krestyankin.library.repositories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.krestyankin.library.models.Book;
 import ru.krestyankin.library.models.Genre;
 
@@ -29,6 +30,9 @@ class BookRepositoryImplTest {
     @Autowired
     private AuthorRepository authorRepositoryJpa;
 
+    @Autowired
+    private TestEntityManager entityManager;
+
     @Test
     void save() {
         long count = repositoryJpa.count();
@@ -36,7 +40,7 @@ class BookRepositoryImplTest {
         book.setTitle(BOOK_TITLE);
         book.setAuthors(Collections.singleton(authorRepositoryJpa.findById(1L).get()));
         book.setGenres(Collections.singleton(new Genre(1, "genre 1")));
-        repositoryJpa.save(book);
+        entityManager.persist(book);
         assertEquals(count+1, repositoryJpa.count());
         book=repositoryJpa.findById(NEW_BOOK_ID).get();
         assertEquals(BOOK_TITLE, book.getTitle());

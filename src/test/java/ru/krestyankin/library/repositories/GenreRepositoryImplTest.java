@@ -3,6 +3,7 @@ package ru.krestyankin.library.repositories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.krestyankin.library.models.Genre;
 
 import java.util.List;
@@ -22,17 +23,19 @@ class GenreRepositoryImplTest {
     @Autowired
     private GenreRepository repositoryJpa;
 
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Test
     void save() {
         long count = repositoryJpa.count();
         Genre genre = new Genre();
-        genre.setName(GENRE_NAME);
-        repositoryJpa.save(genre);
+        genre.setName(GENRE_NAME_NEW);
+        entityManager.persist(genre);
         assertEquals(count+1, repositoryJpa.count());
         genre = repositoryJpa.findById(GENRE_ID_NEW).get();
         assertEquals(GENRE_ID_NEW, genre.getId());
-        assertEquals(GENRE_NAME, genre.getName());
+        assertEquals(GENRE_NAME_NEW, genre.getName());
     }
 
     @Test
