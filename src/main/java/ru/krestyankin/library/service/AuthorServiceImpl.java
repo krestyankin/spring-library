@@ -4,7 +4,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.transaction.annotation.Transactional;
 import ru.krestyankin.library.models.Author;
-import ru.krestyankin.library.repositories.AuthorRepositoryJpa;
+import ru.krestyankin.library.repositories.AuthorRepository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,18 +15,18 @@ import java.util.Scanner;
 
 @ShellComponent
 public class AuthorServiceImpl implements AuthorService {
-    private final AuthorRepositoryJpa authorRepositoryJpa;
+    private final AuthorRepository authorRepository;
     private final Scanner in;
 
-    public AuthorServiceImpl(AuthorRepositoryJpa authorRepositoryJpa) {
-        this.authorRepositoryJpa = authorRepositoryJpa;
+    public AuthorServiceImpl(AuthorRepository authorRepository) {
+        this.authorRepository = authorRepository;
         this.in = new Scanner(System.in);
     }
 
     @Override
     @ShellMethod(value = "Get author by id", key = {"get author", "ag"})
     public Optional<Author> getById(long authorId) {
-        return authorRepositoryJpa.findById(authorId);
+        return authorRepository.findById(authorId);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class AuthorServiceImpl implements AuthorService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        author = authorRepositoryJpa.save(author);
+        author = authorRepository.save(author);
         System.out.println(author);
     }
 
@@ -50,7 +50,7 @@ public class AuthorServiceImpl implements AuthorService {
     @ShellMethod(value = "Edit author", key = {"edit author", "ae"})
     @Transactional
     public void update(long authorId) {
-        Author author = authorRepositoryJpa.findById(authorId).orElseThrow(IllegalArgumentException::new);
+        Author author = authorRepository.findById(authorId).orElseThrow(IllegalArgumentException::new);
         System.out.println("Редактирование автора");
         System.out.print("ФИО: ");
         author.setFullname(in.nextLine());
@@ -60,25 +60,25 @@ public class AuthorServiceImpl implements AuthorService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        authorRepositoryJpa.save(author);
+        authorRepository.save(author);
     }
 
     @Override
     @Transactional
     @ShellMethod(value = "Delete author", key = {"delete author", "ad"})
     public void delete(long authorId) {
-        authorRepositoryJpa.deleteById(authorId);
+        authorRepository.deleteById(authorId);
     }
 
     @Override
     @ShellMethod(value = "Get all authors", key = {"get authors", "aga"})
     public List<Author> getAll() {
-        return authorRepositoryJpa.findAll();
+        return authorRepository.findAll();
     }
 
     @Override
     @ShellMethod(value = "Get authors count", key = {"get authors count", "agc"})
     public void count() {
-        System.out.println("Всего авторов " + authorRepositoryJpa.count());
+        System.out.println("Всего авторов " + authorRepository.count());
     }
 }

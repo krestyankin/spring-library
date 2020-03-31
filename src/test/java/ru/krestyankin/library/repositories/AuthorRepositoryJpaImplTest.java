@@ -3,17 +3,15 @@ package ru.krestyankin.library.repositories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import ru.krestyankin.library.models.Author;
 
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@Import(AuthorRepositoryJpaImpl.class)
 class AuthorRepositoryJpaImplTest {
     private static final long AUTHOR_ID = 1;
     private static final String AUTHOR_NAME = "Author 1";
@@ -22,7 +20,7 @@ class AuthorRepositoryJpaImplTest {
     private static final int EXPECTED_NUMBER_OF_AUTHORS = 4;
 
     @Autowired
-    private AuthorRepositoryJpa repositoryJpa;
+    private AuthorRepository repositoryJpa;
 
     @Test
     void save() {

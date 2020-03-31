@@ -3,7 +3,6 @@ package ru.krestyankin.library.repositories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import ru.krestyankin.library.models.Book;
 import ru.krestyankin.library.models.Genre;
 
@@ -14,27 +13,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@Import({BookRepositoryJpaImpl.class, AuthorRepositoryJpaImpl.class})
-class BookRepositoryJpaImplTest {
+class BookRepositoryImplTest {
     private static final int EXPECTED_NUMBER_OF_BOOKS=3;
     private static final long BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS = 3;
     private static final String BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS_TITLE="Book with 3 genres by 2 authors";
     private static final String BOOK_TITLE="TEST";
     private static final long BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS_COMMENTS = 2;
     private static final long NEW_BOOK_ID=4;
+    private static final String BOOK_TITLE_LIKE="Simple%";
+    private static final String BOOK_TITLE_EXPECTED="Simple book";
 
     @Autowired
-    private BookRepositoryJpa repositoryJpa;
+    private BookRepository repositoryJpa;
 
     @Autowired
-    private AuthorRepositoryJpa authorRepositoryJpa;
+    private AuthorRepository authorRepositoryJpa;
 
     @Test
     void save() {
         long count = repositoryJpa.count();
         Book book = new Book();
         book.setTitle(BOOK_TITLE);
-        book.setAuthors(Collections.singleton(authorRepositoryJpa.findById(1).get()));
+        book.setAuthors(Collections.singleton(authorRepositoryJpa.findById(1L).get()));
         book.setGenres(Collections.singleton(new Genre(1, "genre 1")));
         repositoryJpa.save(book);
         assertEquals(count+1, repositoryJpa.count());
@@ -64,7 +64,7 @@ class BookRepositoryJpaImplTest {
 
     @Test
         void findByTitle() {
-        List<Book> books = repositoryJpa.findByTitle(BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS_TITLE);
+        List<Book> books = repositoryJpa.findByTitleIsLike(BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS_TITLE);
         assertThat(books).isNotNull().hasSize(1);
     }
 
@@ -73,7 +73,7 @@ class BookRepositoryJpaImplTest {
         long count = repositoryJpa.count();
         repositoryJpa.deleteById(BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS);
         assertEquals(count-1, repositoryJpa.count());
-        List<Book> books = repositoryJpa.findByTitle(BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS_TITLE);
+        List<Book> books = repositoryJpa.findByTitleIsLike(BOOK_WITH_THREE_GENRES_BY_TWO_AUTHORS_TITLE);
         assertThat(books).isNotNull().hasSize(0);
     }
 
@@ -83,8 +83,14 @@ class BookRepositoryJpaImplTest {
     }
 
     @Test
-    void findByAuthor() {
-        List<Book> books = repositoryJpa.findByAuthor(authorRepositoryJpa.findById(3).get());
+    void findByAuthors() {
+        List<Book> books = repositoryJpa.findByAuthors(authorRepositoryJpa.findById(3L).get());
         assertThat(books).isNotNull().hasSize(1).allMatch(book-> book.getAuthors()!=null && book.getAuthors().size()==2);
+    }
+
+    @Test
+    void findByFullname() {
+        List<Book> books = repositoryJpa.findByTitleIsLike(BOOK_TITLE_LIKE);
+        assertThat(books).isNotNull().hasSize(1).allMatch(book -> book.getTitle().equals(BOOK_TITLE_EXPECTED));
     }
 }
