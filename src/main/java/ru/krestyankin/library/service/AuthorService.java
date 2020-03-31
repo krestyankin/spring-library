@@ -1,10 +1,15 @@
 package ru.krestyankin.library.service;
 
-import ru.krestyankin.library.domain.Author;
+import ru.krestyankin.library.models.Author;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface AuthorService {
-   Author getById(long authorId);
+   Optional<Author> getById(long authorId);
    void add();
    void update(long authorId);
    void delete(long authorId);
+   List<Author> getAll();
+   void count();
 }

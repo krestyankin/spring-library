@@ -1,10 +1,13 @@
 package ru.krestyankin.library.service;
 
-import ru.krestyankin.library.domain.Book;
-
 public interface BookService {
-    Book getById(long bookId);
+    void getById(long bookId);
     void add();
     void update(long bookId);
     void delete(long bookId);
+    void addComment(long bookId);
+    void deleteComment(long bookId);
+    void all();
+    void findByTitle(String title);
+    void findByAuthor();
 }
