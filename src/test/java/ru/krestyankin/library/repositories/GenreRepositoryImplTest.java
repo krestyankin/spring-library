@@ -3,7 +3,7 @@ package ru.krestyankin.library.repositories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.krestyankin.library.models.Genre;
 
 import java.util.List;
@@ -13,8 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@Import(GenreRepositoryJpaImpl.class)
-class GenreRepositoryJpaImplTest {
+class GenreRepositoryImplTest {
     private static final long GENRE_ID = 1;
     private static final String GENRE_NAME = "genre 1";
     private static final long GENRE_ID_NEW = 4;
@@ -22,19 +21,21 @@ class GenreRepositoryJpaImplTest {
     private static final int EXPECTED_NUMBER_OF_GENRES=3;
 
     @Autowired
-    private GenreRepositoryJpa repositoryJpa;
+    private GenreRepository repositoryJpa;
 
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Test
     void save() {
         long count = repositoryJpa.count();
         Genre genre = new Genre();
-        genre.setName(GENRE_NAME);
-        repositoryJpa.save(genre);
+        genre.setName(GENRE_NAME_NEW);
+        entityManager.persist(genre);
         assertEquals(count+1, repositoryJpa.count());
         genre = repositoryJpa.findById(GENRE_ID_NEW).get();
         assertEquals(GENRE_ID_NEW, genre.getId());
-        assertEquals(GENRE_NAME, genre.getName());
+        assertEquals(GENRE_NAME_NEW, genre.getName());
     }
 
     @Test

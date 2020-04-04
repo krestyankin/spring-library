@@ -3,18 +3,17 @@ package ru.krestyankin.library.repositories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.krestyankin.library.models.Author;
 
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@Import(AuthorRepositoryJpaImpl.class)
-class AuthorRepositoryJpaImplTest {
+class AuthorRepositoryImplTest {
     private static final long AUTHOR_ID = 1;
     private static final String AUTHOR_NAME = "Author 1";
     private static final long AUTHOR_ID_NEW = 5;
@@ -22,7 +21,10 @@ class AuthorRepositoryJpaImplTest {
     private static final int EXPECTED_NUMBER_OF_AUTHORS = 4;
 
     @Autowired
-    private AuthorRepositoryJpa repositoryJpa;
+    private AuthorRepository repositoryJpa;
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Test
     void save() {
@@ -30,7 +32,7 @@ class AuthorRepositoryJpaImplTest {
         Author author = new Author();
         author.setFullname(AUTHOR_NAME_NEW);
         author.setDateOfBirth(new Date());
-        repositoryJpa.save(author);
+        entityManager.persist(author);
         assertEquals(count+1, repositoryJpa.count());
         author = repositoryJpa.findById(AUTHOR_ID_NEW).get();
         assertEquals(AUTHOR_ID_NEW, author.getId());
