@@ -3,25 +3,29 @@ package ru.krestyankin.library.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "comments")
+@Document(collection = "comments")
 public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
-    @Column(name = "text", nullable = false, unique = false)
+    @Field(name = "text")
     private String text;
 
-    @OneToOne(targetEntity = Book.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "book_id")
+    @DBRef
     private Book book;
+
+    public Comment(String text, Book book) {
+        this.text = text;
+        this.book = book;
+    }
 
     @Override
     public String toString() {
