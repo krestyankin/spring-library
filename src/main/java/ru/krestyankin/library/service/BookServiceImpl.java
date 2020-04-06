@@ -2,14 +2,15 @@ package ru.krestyankin.library.service;
 
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
-import org.springframework.transaction.annotation.Transactional;
 import ru.krestyankin.library.models.Book;
 import ru.krestyankin.library.models.Comment;
 import ru.krestyankin.library.repositories.AuthorRepository;
 import ru.krestyankin.library.repositories.BookRepository;
+import ru.krestyankin.library.repositories.CommentRepository;
 import ru.krestyankin.library.repositories.GenreRepository;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -18,88 +19,64 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
+    private final CommentRepository commentRepository;
     private final Scanner in;
 
-    public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository, GenreRepository genreRepository) {
+    public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository, GenreRepository genreRepository, CommentRepository commentRepository) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
         this.genreRepository = genreRepository;
+        this.commentRepository = commentRepository;
         this.in = new Scanner(System.in);
     }
 
     @Override
     @ShellMethod(value = "Get book", key = {"get book", "bg"})
-    @Transactional
-    public void getById(long bookId) {
+    public void getById(String bookId) {
         Book book = bookRepository.findById(bookId).get();
         System.out.println("Книга: ");
         System.out.println(book);
         System.out.println("Комментарии: ");
-        System.out.println(book.getComments());
+        List<Comment> comments = commentRepository.getCommentsByBook(bookId);
+        if(comments.size()!=0) {
+            comments.forEach(System.out::println);
+        }
+        else
+            System.out.println("Комментарии отсутствуют");
     }
 
     @Override
     @ShellMethod(value = "Add book", key = {"add book", "ba"})
-    @Transactional
     public void add() {
         System.out.println("Добавление книги");
         Book book = new Book();
         System.out.print("Название: ");
         book.setTitle(in.nextLine());
         System.out.print("Автор(ы), ИД через запятую: ");
-        book.setAuthors(Arrays.stream(in.nextLine().split("[, ]+")).map(authorId -> authorRepository.findById(Long.parseLong(authorId)).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toSet()));
+        book.setAuthors(Arrays.stream(in.nextLine().split("[, ]+")).map(authorId -> authorRepository.findById(authorId).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toList()));
         System.out.print("Жанр(ы), ИД через запятую: ");
-        book.setGenres(Arrays.stream(in.nextLine().split("[, ]+")).map(genreId -> genreRepository.findById(Long.parseLong(genreId)).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toSet()));
+        book.setGenres(Arrays.stream(in.nextLine().split("[, ]+")).map(genreId -> genreRepository.findById(genreId).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toList()));
         bookRepository.save(book);
     }
 
     @Override
     @ShellMethod(value = "Edit book", key = {"edit book", "be"})
-    @Transactional
-    public void update(long bookId) {
+    public void update(String bookId) {
         System.out.println("Редактирование книги");
         Book book = bookRepository.findById(bookId).orElseThrow(IllegalArgumentException::new);
         System.out.print("Название: ");
         book.setTitle(in.nextLine());
         System.out.print("Автор(ы), ИД через запятую: ");
-        book.setAuthors(Arrays.stream(in.nextLine().split("[, ]+")).map(authorId -> authorRepository.findById(Long.parseLong(authorId)).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toSet()));
+        book.setAuthors(Arrays.stream(in.nextLine().split("[, ]+")).map(authorId -> authorRepository.findById(authorId).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toList()));
         System.out.print("Жанр(ы), ИД через запятую: ");
-        book.setGenres(Arrays.stream(in.nextLine().split("[, ]+")).map(genreId -> genreRepository.findById(Long.parseLong(genreId)).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toSet()));
+        book.setGenres(Arrays.stream(in.nextLine().split("[, ]+")).map(genreId -> genreRepository.findById(genreId).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toList()));
         bookRepository.save(book);
     }
 
     @Override
     @ShellMethod(value = "Delete book", key = {"delete book", "bd"})
-    @Transactional
-    public void delete(long bookId) {
+    public void delete(String bookId) {
         bookRepository.deleteById(bookId);
-    }
-
-    @Override
-    @ShellMethod(value = "Add comment", key = {"add comment", "bca"})
-    @Transactional
-    public void addComment(long bookId) {
-        System.out.println("Добавление комментария");
-        Book book = bookRepository.findById(bookId).orElseThrow(IllegalArgumentException::new);
-        Comment comment = new Comment();
-        comment.setBook(book);
-        System.out.print("Текст: ");
-        comment.setText(in.nextLine());
-        book.getComments().add(comment);
-    }
-
-    @Override
-    @ShellMethod(value = "Delete comment", key = {"delete comment", "bcd"})
-    @Transactional
-    public void deleteComment(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(IllegalArgumentException::new);
-        System.out.println("Удаление комментария");
-        int i=1;
-        for (Comment c: book.getComments()) {
-            System.out.println("#"+i+" "+c.getText());
-        }
-        System.out.print("#: ");
-        book.getComments().remove(Integer.parseInt(in.nextLine())-1);
     }
 
     @Override
@@ -118,11 +95,10 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @ShellMethod(value = "Find books by author", key = {"find books by author", "bfa"})
-    @Transactional
     public void findByAuthor() {
         System.out.println("Поиск книги по автору");
         authorRepository.findAll().forEach(author -> System.out.println(author));
         System.out.print("ИД автора: ");
-        System.out.println(bookRepository.findByAuthors(authorRepository.findById(Long.parseLong(in.nextLine())).get()));
+        System.out.println(bookRepository.findByAuthors(authorRepository.findById(in.nextLine()).get()));
     }
 }

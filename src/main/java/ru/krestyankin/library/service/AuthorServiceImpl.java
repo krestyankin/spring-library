@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @ShellComponent
 public class AuthorServiceImpl implements AuthorService {
@@ -25,13 +27,12 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @ShellMethod(value = "Get author by id", key = {"get author", "ag"})
-    public Optional<Author> getById(long authorId) {
+    public Optional<Author> getById(String authorId) {
         return authorRepository.findById(authorId);
     }
 
     @Override
     @ShellMethod(value = "Add author", key = {"add author", "aa"})
-    @Transactional
     public void add() {
         Author author = new Author();
         System.out.print("Имя: ");
@@ -49,7 +50,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @ShellMethod(value = "Edit author", key = {"edit author", "ae"})
     @Transactional
-    public void update(long authorId) {
+    public void update(String authorId) {
         Author author = authorRepository.findById(authorId).orElseThrow(IllegalArgumentException::new);
         System.out.println("Редактирование автора");
         System.out.print("ФИО: ");
@@ -66,14 +67,14 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional
     @ShellMethod(value = "Delete author", key = {"delete author", "ad"})
-    public void delete(long authorId) {
+    public void delete(String authorId) {
         authorRepository.deleteById(authorId);
     }
 
     @Override
     @ShellMethod(value = "Get all authors", key = {"get authors", "aga"})
     public List<Author> getAll() {
-        return authorRepository.findAll();
+        return StreamSupport.stream(authorRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     @Override

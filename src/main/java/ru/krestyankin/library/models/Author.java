@@ -3,28 +3,30 @@ package ru.krestyankin.library.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "authors")
+@Document(collection = "authors")
 public class Author {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
-    @Column(name = "fullname", nullable = false, unique = false)
+    @Field(name = "fullname")
     private String fullname;
-    @Column(name = "dob", nullable = true, unique = false)
+
+    @Field(name = "dob")
     private Date dateOfBirth;
 
-    @ManyToMany(mappedBy = "authors")
-    private List<Book> books;
+    public Author(String fullname, Date dateOfBirth) {
+        this.fullname = fullname;
+        this.dateOfBirth = dateOfBirth;
+    }
 
     @Override
     public String toString() {
