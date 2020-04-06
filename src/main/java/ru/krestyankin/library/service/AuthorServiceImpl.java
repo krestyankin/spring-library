@@ -51,7 +51,7 @@ public class AuthorServiceImpl implements AuthorService {
     @ShellMethod(value = "Edit author", key = {"edit author", "ae"})
     @Transactional
     public void update(String authorId) {
-     /*   Author author = authorRepository.findById(authorId).orElseThrow(IllegalArgumentException::new);
+        Author author = authorRepository.findById(authorId).orElseThrow(IllegalArgumentException::new);
         System.out.println("Редактирование автора");
         System.out.print("ФИО: ");
         author.setFullname(in.nextLine());
@@ -62,15 +62,13 @@ public class AuthorServiceImpl implements AuthorService {
             e.printStackTrace();
         }
         authorRepository.save(author);
-
-      */
     }
 
     @Override
     @Transactional
     @ShellMethod(value = "Delete author", key = {"delete author", "ad"})
     public void delete(String authorId) {
-        //authorRepository.deleteById(authorId);
+        authorRepository.deleteById(authorId);
     }
 
     @Override
