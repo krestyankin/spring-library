@@ -27,7 +27,7 @@ public class InitMongoDBDataChangeLog {
                 new Author("Илья Ильф", formatter.parse("03.10.1897")),
                 new Author("Евгений Петров", formatter.parse("03.10.1897"))
         );
-        genres = List.of(new Genre("'Программирование'"), new Genre("'Java'"), new Genre("'Детектив'"), new Genre("'Сатира'"));
+        genres = List.of(new Genre("Программирование"), new Genre("Java"), new Genre("Детектив"), new Genre("Сатира"));
     }
 
     @ChangeSet(order = "000", id = "dropDB", author = "dkrestyankin", runAlways = true)

@@ -4,7 +4,7 @@ logging:
 spring:
   shell:
     interactive:
-      enabled: true
+      enabled: false
   data:
     mongodb:
       uri: mongodb://localhost:27017
