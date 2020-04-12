@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Library</title>
+</head>
+<body class="bg-light">
+  <div class="container">
+      <h1 th:text="${book.title}">Book title</h1>
+      <h2>Authors:</h2>
+      <ul th:each="author : ${book.authors}">
+          <li th:text="${author.fullname}">Author Name</li>
+      </ul>
+      <h2>Genres:</h2>
+      <ul th:each="genre : ${book.genres}">
+          <li th:text="${genre.name}">Genre name</li>
+      </ul>
+      <h2>Comments</h2>
+      <table class="table">
+          <thead>
+          <tr>
+              <th>Text</th>
+              <th>Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="comment : ${comments}">
+              <td th:text="${comment.text}">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+              <td>
+                  <a th:href="@{/comment/delete(id=${comment.id})}" href="../comment/delete.html" class="btn btn-sm btn-danger">Delete</a>
+              </td>
+          </tr>
+          </tbody>
+      </table>
+      <h3>Add comment</h3>
+      <form th:action="@{/comment/save}" th:method="post" action="../comment/save.html">
+          <div class="form-group row">
+              <input type="hidden" class="form-control" name="bookId" value="" th:value="${book.id}">
+              <div class="col-sm-10">
+                  <input type="text" class="form-control" id="text" name="text" value="">
+              </div>
+              <div class="col-sm-2">
+                  <button type="submit" class="btn btn-primary mb-2">Add</button>
+              </div>
+          </div>
+      </form>
+    </div>
+</body>
+</html>

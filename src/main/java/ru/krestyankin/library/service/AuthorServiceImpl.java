@@ -2,7 +2,6 @@ package ru.krestyankin.library.service;
 
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
-import org.springframework.transaction.annotation.Transactional;
 import ru.krestyankin.library.models.Author;
 import ru.krestyankin.library.repositories.AuthorRepository;
 
@@ -49,7 +48,6 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @ShellMethod(value = "Edit author", key = {"edit author", "ae"})
-    @Transactional
     public void update(String authorId) {
         Author author = authorRepository.findById(authorId).orElseThrow(IllegalArgumentException::new);
         System.out.println("Редактирование автора");
@@ -65,7 +63,6 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    @Transactional
     @ShellMethod(value = "Delete author", key = {"delete author", "ad"})
     public void delete(String authorId) {
         authorRepository.deleteById(authorId);
