@@ -18,34 +18,56 @@
           <li th:text="${genre.name}">Genre name</li>
       </ul>
       <h2>Comments</h2>
-      <table class="table">
+      <table class="table" id="book-comments">
           <thead>
           <tr>
               <th>Text</th>
               <th>Action</th>
           </tr>
           </thead>
-          <tbody>
-          <tr th:each="comment : ${comments}">
-              <td th:text="${comment.text}">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
-              <td>
-                  <a th:href="@{/comment/delete(id=${comment.id})}" href="../comment/delete.html" class="btn btn-sm btn-danger">Delete</a>
-              </td>
-          </tr>
+          <tbody id="commentlist">
           </tbody>
       </table>
       <h3>Add comment</h3>
-      <form th:action="@{/comment/save}" th:method="post" action="../comment/save.html">
           <div class="form-group row">
-              <input type="hidden" class="form-control" name="bookId" value="" th:value="${book.id}">
               <div class="col-sm-10">
-                  <input type="text" class="form-control" id="text" name="text" value="">
+                  <input type="text" class="form-control" id="comment-text" name="comment-text" value="">
               </div>
               <div class="col-sm-2">
-                  <button type="submit" class="btn btn-primary mb-2">Add</button>
+                  <button class="btn btn-primary mb-2" id="btn-add-comment" onclick="AddComment()">Add</button>
               </div>
           </div>
-      </form>
     </div>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script th:inline="javascript">
+      /*<![CDATA[*/
+      var bookId = /*[[${book.id}]]*/ 'bookId';
+      /*]]>*/
+  </script>
+  <script language="JavaScript">
+      $(function () {
+          $.get('/comment/get/'+bookId).done(function (comments) {
+              comments.forEach(function (comment) {
+                  $('#commentlist').append(`<tr id="comment-${comment.id}"><td>${comment.text}</td><td><button class="btn btn-sm btn-danger comment-del" data-id="${comment.id}">Delete</button></td></tr>`)
+              });
+              $('#commentlist').on('click','.comment-del', function () {
+                  var commentId=$(this).data('id');
+                  $.ajax({
+                      url: '/comment/delete/'+commentId,
+                      type: 'DELETE',
+                      success: function(result) {
+                          $( "#comment-"+commentId).remove();
+                      }
+                  });
+              });
+          })
+      });
+
+      function AddComment(){
+          $.post('/comment/add/', { "bookId": bookId, "text": $('#comment-text').val()}).done(function (comment) {
+              $('#commentlist').append(`<tr id="comment-${comment.id}"><td>${comment.text}</td><td><button class="btn btn-sm btn-danger comment-del" data-id="${comment.id}">Delete</button></td></tr>`);
+          })
+      }
+  </script>
 </body>
 </html>
