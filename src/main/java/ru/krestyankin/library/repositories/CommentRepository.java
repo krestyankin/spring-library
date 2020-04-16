@@ -6,6 +6,6 @@ import ru.krestyankin.library.models.Comment;
 import java.util.List;
 
 public interface CommentRepository extends MongoRepository<Comment, String> {
-    List<Comment> getCommentsByBook(String bookId);
+    List<Comment> findAllByBook(String bookId);
     void deleteAllByBook(String bookId);
 }
