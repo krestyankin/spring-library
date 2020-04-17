@@ -19,5 +19,4 @@ public class ApplicationConfig {
     public Mongock mongock(MongoProperties mongoProps, MongoClient mongoClient) {
          return new SpringMongockBuilder(mongoClient, mongoProps.getDatabase(), CHANGELOGS_PACKAGE).build();
     }
-
 }

@@ -17,6 +17,6 @@ public class MongoBookCascadeEventListner extends AbstractMongoEventListener<Boo
     @Override
     public void onAfterDelete(AfterDeleteEvent<Book> event) {
         super.onAfterDelete(event);
-        commentRepository.deleteAllByBook(event.getSource().get("_id").toString());
+        commentRepository.deleteAllByBook(event.getSource().get("id").toString()).subscribe();
     }
 }

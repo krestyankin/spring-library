@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.ComponentScan;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import ru.krestyankin.library.models.Author;
 import ru.krestyankin.library.models.Book;
 import ru.krestyankin.library.models.Comment;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 @DataMongoTest
@@ -25,28 +27,40 @@ class BookRepositoryTest {
     @DisplayName(" искать книгу по названию")
     @Test
     void findByTitleIsLike() {
-        assertThat(bookRepository.findByTitleIsLike("*Java*")).hasSize(1);
+        StepVerifier.create(bookRepository.findByTitleIsLike("*Java*"))
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
     }
 
     @DisplayName(" искать книгу по автору")
     @Test
     void findByAuthors() {
-        Book book = bookRepository.findAll().get(0);
-        assertThat(bookRepository.findByAuthors(book.getAuthors().iterator().next())).hasSize(1).
-                allMatch(b -> b.getId().equals(book.getId()));
+        Mono<Book> book=bookRepository.findAll().next();
+        Mono<Author> author = book.map(b -> b.getAuthors().get(0));
+        StepVerifier.create(bookRepository.findByAuthors(author))
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
     }
 
     @DisplayName(" должен удалять книгу вместе с комментариями")
     @Test
     void shouldCorrectDeleteBook() {
-        Book book = bookRepository.findAll().get(1);
-        commentRepository.save(new Comment("Test comment 1", book));
-        commentRepository.save(new Comment("Test comment 2", book));
-        long initialCommentsCount = commentRepository.count();
-        long initialBooksCount = bookRepository.count();
-        bookRepository.delete(book);
-        assertThat(commentRepository.count()).isEqualTo(initialCommentsCount-2);
-        assertThat(bookRepository.count()).isEqualTo(initialBooksCount-1);
+        Mono<Book> book=bookRepository.findAll().elementAt(1);
+        Mono<Book> bookWithComments = book.flatMap(b ->
+                Mono.from(commentRepository.save(new Comment("Test comment 1", b)))
+                        .then(commentRepository.save(new Comment("Test comment 2", b)))
+                        .then(Mono.just(b)));
+        StepVerifier.create(Flux.from(bookWithComments).thenMany(book.flatMapMany(b->commentRepository.findAllByBook(b.getId()))))
+                .expectNextCount(2)
+                .expectComplete().verify();
+
+        Mono<String> deletedBookId = book.flatMap(b-> Mono.from(bookRepository.deleteById(b.getId())).
+                then(Mono.just(b.getId())));
+        StepVerifier.create(deletedBookId.flatMapMany(b->commentRepository.findAllByBook(b)))
+                .expectNextCount(0).expectComplete().verify();
+
     }
 
 }
