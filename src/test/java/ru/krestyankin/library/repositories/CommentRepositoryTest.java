@@ -28,10 +28,10 @@ class CommentRepositoryTest {
         comment.setBook(book);
         comment.setText("Comment text");
         commentRepository.save(comment);
-        assertThat(commentRepository.findAllByBook(book.getId())).isNotNull().hasSize(1).allMatch(c -> c.getText().equals(comment.getText()));
+        assertThat(commentRepository.getCommentsByBook(book.getId())).isNotNull().hasSize(1).allMatch(c -> c.getText().equals(comment.getText()));
         long initialCommentsCount = commentRepository.count();
         commentRepository.delete(comment);
-        assertThat(commentRepository.findAllByBook(book.getId())).hasSize(0);
+        assertThat(commentRepository.getCommentsByBook(book.getId())).hasSize(0);
         assertThat(commentRepository.count()).isEqualTo(initialCommentsCount-1);
     }
 
@@ -40,14 +40,14 @@ class CommentRepositoryTest {
     void shouldCorrectDeleteAllBookComments() {
         Book book = bookRepository.findAll().get(0);
         commentRepository.deleteAllByBook(book.getId());
-        assertThat(commentRepository.findAllByBook(book.getId())).hasSize(0);
+        assertThat(commentRepository.getCommentsByBook(book.getId())).hasSize(0);
     }
 
     @DisplayName(" должен корректно получать комментарии книги")
     @Test
     void shouldCorrectFetchBookComment() {
         Book book = bookRepository.findAll().get(2);
-        assertThat(commentRepository.findAllByBook(book.getId())).isNotNull().hasSize(3).
+        assertThat(commentRepository.getCommentsByBook(book.getId())).isNotNull().hasSize(3).
                 allMatch(comment -> comment.getId()!=null && comment.getText().startsWith("Комментарий "));
     }
 

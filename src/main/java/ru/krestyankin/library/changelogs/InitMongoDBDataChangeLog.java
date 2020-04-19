@@ -4,10 +4,9 @@ import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
 import com.mongodb.client.MongoDatabase;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import ru.krestyankin.library.models.Author;
-import ru.krestyankin.library.models.Book;
-import ru.krestyankin.library.models.Comment;
-import ru.krestyankin.library.models.Genre;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.krestyankin.library.models.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,8 +18,10 @@ import java.util.Locale;
 public class InitMongoDBDataChangeLog {
     private final List<Author> authors;
     private final List<Genre> genres;
+    private PasswordEncoder passwordEncoder;
 
     public InitMongoDBDataChangeLog() throws ParseException {
+        this.passwordEncoder = new BCryptPasswordEncoder(10);
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
         authors = List.of(new Author("Joshua J. Bloch", formatter.parse("28.08.1961")),
                 new Author("Агата Кристи", formatter.parse("15.09.1890")),
@@ -71,6 +72,11 @@ public class InitMongoDBDataChangeLog {
         template.save(book);
         for(int i=1;i<=3;i++)
             template.save(new Comment("Комментарий "+i, book));
+    }
+
+    @ChangeSet(order = "004", id = "initUsers", author = "dkrestyankin", runAlways = true)
+    public void initUsers(MongoTemplate template){
+        template.save(new User("admin", passwordEncoder.encode("password")));
     }
 
 }
