@@ -1,11 +1,10 @@
 package ru.krestyankin.library.repositories;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
 import ru.krestyankin.library.models.Author;
 
-import java.util.List;
-
-public interface AuthorRepository extends MongoRepository<Author, String> {
-    List<Author> findByFullname(String fullname);
+public interface AuthorRepository extends ReactiveMongoRepository<Author, String> {
+    Flux<Author> findByFullname(String fullname);
 
 }

@@ -25,16 +25,14 @@
           <div class="form-group row">
               <label for="title" class="col-sm-2 col-form-label">Authors</label>
               <div class="col-sm-10">
-                  <select class="custom-select" multiple name="authors[]" th:field="*{book.authors}">
-                      <option value="author-id" th:each="author : ${authors}" th:value="${author.id}" th:text="${author.fullname}">Author name</option>
+                  <select class="custom-select" multiple name="authors[]" th:field="*{book.authors}" id="authors">
                   </select>
               </div>
           </div>
           <div class="form-group row">
               <label for="title" class="col-sm-2 col-form-label">Genres</label>
               <div class="col-sm-10">
-                  <select class="custom-select" multiple name="genres[]" th:field="*{book.genres}">
-                      <option value="genre-id" th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}">Genre name</option>
+                  <select class="custom-select" multiple name="genres[]" th:field="*{book.genres}" id="genres">
                   </select>
               </div>
           </div>
@@ -46,5 +44,25 @@
           </div>
       </form>
   </div>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script th:inline="javascript">
+      /*<![CDATA[*/
+      var book = /*[[${book}]]*/ 'book';
+      /*]]>*/
+  </script>
+  <script language="JavaScript">
+      $(function () {
+          $.get('/author/all').done(function (authors) {
+              authors.forEach(function (author) {
+                  $('#authors').append('<option value="'+author.id+'"'+(book.authors.includes(author.id)?' selected="selected"':'')+'>'+author.fullname+'</option>');
+              });
+          });
+          $.get('/genre/all').done(function (genres) {
+              genres.forEach(function (genre) {
+                  $('#genres').append('<option value="'+genre.id+'"'+(book.genres.includes(genre.id)?' selected="selected"':'')+'>'+genre.name+'</option>');
+              });
+          });
+      });
+  </script>
 </body>
 </html>

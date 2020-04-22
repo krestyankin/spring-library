@@ -3,12 +3,12 @@ package ru.krestyankin.library.rest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-import ru.krestyankin.library.models.Author;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 import ru.krestyankin.library.models.Book;
-import ru.krestyankin.library.models.Genre;
 import ru.krestyankin.library.repositories.AuthorRepository;
 import ru.krestyankin.library.repositories.BookRepository;
 import ru.krestyankin.library.repositories.CommentRepository;
@@ -20,15 +20,11 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest({BookController.class, BookDtoConverter.class})
+@WebFluxTest({BookController.class, BookDtoConverter.class})
 class BookControllerTest {
     @Autowired
-    private MockMvc mvc;
+    private WebTestClient webClient;
 
     @MockBean
     private BookRepository bookRepository;
@@ -39,44 +35,23 @@ class BookControllerTest {
     @MockBean
     private GenreRepository genreRepository;
 
+
     private static final List<String> BOOK_TITLES = List.of("Book12345","AnotherBook54321");
 
     @Test
-    void viewPage() throws Exception {
+    void viewPage() {
         given(bookRepository.findById("book1"))
-                .willReturn(java.util.Optional.of(new Book("book1", BOOK_TITLES.get(0), null, null)));
-        mvc.perform(get("/book/view").param("id", "book1")).andExpect(status().isOk())
-                .andExpect(content().string(containsString(BOOK_TITLES.get(0))));
-        mvc.perform(get("/book/view").param("id", "book2")).andExpect(status().isNotFound());
+                .willReturn(Mono.just(new Book("book1", BOOK_TITLES.get(0), null, null)));
+        webClient.get().uri(uriBuilder -> uriBuilder.path("/book/view").queryParam("id", "book1").build())
+                .accept(MediaType.TEXT_HTML).exchange()
+                .expectStatus().isOk().expectBody(String.class).value(containsString(BOOK_TITLES.get(0)));
     }
 
     @Test
-    void editPage() throws Exception {
-        given(bookRepository.findById("book1"))
-                .willReturn(java.util.Optional.of(new Book("book1", BOOK_TITLES.get(0), List.of(new Author()), List.of(new Genre()))));
-        mvc.perform(get("/book/edit").param("id", "book1")).andExpect(status().isOk())
-                .andExpect(content().string(containsString(BOOK_TITLES.get(0))));
-    }
-
-    @Test
-    void savePage() throws Exception {
-        mvc.perform(post("/book/save")
-                .param("id", "book")
-                .param("title", BOOK_TITLES.get(0))
-                .param("authors", "")
-                .param("genres", "")
-        ).andExpect(status().isOk());
-        Mockito.verify(bookRepository, times(1)).save(Mockito.any());
-    }
-
-    @Test
-    void deletePage() throws Exception {
-        mvc.perform(get("/book/delete").param("id", "book1")).andExpect(status().isOk());
+    void deletePage() {
+        webClient.get().uri(uriBuilder -> uriBuilder.path("/book/delete").queryParam("id", "book1").build())
+                .accept(MediaType.TEXT_HTML).exchange()
+                .expectStatus().isOk();
         Mockito.verify(bookRepository, times(1)).deleteById("book1");
-    }
-
-    @Test
-    void addPage() throws Exception {
-        mvc.perform(get("/book/add")).andExpect(status().isOk());
     }
 }
