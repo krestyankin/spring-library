@@ -19,12 +19,12 @@ public class CommentController {
     public String savePage(@RequestParam("bookId") String bookId,
                            @RequestParam("text")   String text) {
         commentRepository.save(new Comment(text, bookRepository.findById(bookId).orElseThrow(NotFoundException::new)));
-        return "comment\\save";
+        return "comment/save";
     }
 
     @GetMapping("/comment/delete")
     public String deletePage(@RequestParam("id") String id) {
         commentRepository.deleteById(id);
-        return "comment\\delete";
+        return "comment/delete";
     }
 }

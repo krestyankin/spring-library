@@ -8,7 +8,13 @@
 </head>
 <body class="bg-light">
 <div class="container">
-  <h1>Books</h1>
+    <div class="d-flex flex-column flex-md-row border-bottom mb-3 align-items-center">
+        <h1 class="mr-md-auto">Books</h1>
+        <nav>
+            <a href="/login" class="btn btn-primary" th:if="${!loggedIn}">Login</a>
+            <a href="/logout" class="btn btn-primary" th:if="${loggedIn}">Logout</a>
+        </nav>
+    </div>
   <table class="table">
     <thead class="thead-light">
     <tr>

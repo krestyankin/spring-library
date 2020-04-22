@@ -2,9 +2,6 @@ logging:
   level:
     root: error
 spring:
-  shell:
-    interactive:
-      enabled: false
   data:
     mongodb:
       database: library

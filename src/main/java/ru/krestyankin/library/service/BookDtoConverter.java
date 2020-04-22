@@ -8,10 +8,11 @@ import ru.krestyankin.library.repositories.AuthorRepository;
 import ru.krestyankin.library.repositories.GenreRepository;
 
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
-public class BookDtoService {
+public class BookDtoConverter {
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
 
@@ -26,8 +27,8 @@ public class BookDtoService {
         Book book = new Book();
         book.setId(bookDto.getId());
         book.setTitle(bookDto.getTitle());
-        book.setAuthors(bookDto.getAuthors().stream().map(authorId -> authorRepository.findById(authorId).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toList()));
-        book.setGenres(bookDto.getGenres().stream().map(genreId -> genreRepository.findById(genreId).orElseThrow(IllegalArgumentException::new)).collect(Collectors.toList()));
+        book.setAuthors(StreamSupport.stream(authorRepository.findAllById(bookDto.getAuthors()).spliterator(),false).collect(Collectors.toList()));
+        book.setGenres(StreamSupport.stream(genreRepository.findAllById(bookDto.getGenres()).spliterator(),false).collect(Collectors.toList()));
         return book;
     }
 }
