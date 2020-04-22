@@ -24,7 +24,6 @@ public class InitMongoDBDataChangeLog {
     private final List<Genre> genres;
 
     public InitMongoDBDataChangeLog() throws ParseException {
-        //this.passwordEncoder = new BCryptPasswordEncoder(10);
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
         authors = List.of(new Author("Joshua J. Bloch", formatter.parse("28.08.1961")),
                 new Author("Агата Кристи", formatter.parse("15.09.1890")),
