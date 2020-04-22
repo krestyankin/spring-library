@@ -14,7 +14,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/error");
+        web.ignoring().antMatchers("/error").antMatchers("/h2-console/**");
     }
 
     @Override
@@ -22,9 +22,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests().antMatchers("/", "/book/view").permitAll()
                 .and()
+                .authorizeRequests().antMatchers( "/*/delete" ,"/*/edit","/book/add").hasRole("ADMIN")
+                .and()
                 .authorizeRequests().antMatchers( "/**" ).authenticated()
                 .and()
-                .anonymous().principal(new LibraryUserPrincipal(new User()))
+                .anonymous().principal(new LibraryUserPrincipal(new User())).authorities("ROLE_READER")
                 .and()
                 .formLogin()
                 .and()

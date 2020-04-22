@@ -13,6 +13,7 @@ import ru.krestyankin.library.models.Comment;
 import ru.krestyankin.library.models.Genre;
 import ru.krestyankin.library.repositories.*;
 import ru.krestyankin.library.service.BookDtoConverter;
+import ru.krestyankin.library.service.BookService;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ class BookControllerTest {
     @MockBean
     private GenreRepository genreRepository;
     @MockBean
-    private UserRepository userRepository;
+    private BookService bookService;
 
 
     private static final List<String> BOOK_TITLES = List.of("Book12345","AnotherBook54321");
@@ -67,7 +68,8 @@ class BookControllerTest {
     }
 
     @WithMockUser(
-            username = "admin"
+            username = "admin",
+            authorities = {"ROLE_ADMIN"}
     )
     @Test
     void editPage() throws Exception {
@@ -89,20 +91,31 @@ class BookControllerTest {
                 .param("genres", "")
                 .with(csrf())
         ).andExpect(status().isOk());
-        Mockito.verify(bookRepository, times(1)).save(Mockito.any());
+        Mockito.verify(bookService, times(1)).save(Mockito.any());
     }
 
     @WithMockUser(
-            username = "admin"
+            username = "admin",
+            authorities = {"ROLE_ADMIN"}
     )
     @Test
     void deletePage() throws Exception {
         mvc.perform(get("/book/delete").param("id", "book1")).andExpect(status().isOk());
-        Mockito.verify(bookRepository, times(1)).deleteById("book1");
+        Mockito.verify(bookService, times(1)).deleteById("book1");
     }
 
     @WithMockUser(
-            username = "admin"
+            username = "schoolboy",
+            authorities = {"ROLE_READER"}
+    )
+    @Test
+    void deletePage403() throws Exception {
+        mvc.perform(get("/book/delete").param("id", "book1")).andExpect(status().is(403));
+    }
+
+    @WithMockUser(
+            username = "admin",
+            authorities = {"ROLE_ADMIN"}
     )
     @Test
     void addPage() throws Exception {

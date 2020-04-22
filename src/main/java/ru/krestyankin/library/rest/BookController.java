@@ -15,6 +15,7 @@ import ru.krestyankin.library.repositories.CommentRepository;
 import ru.krestyankin.library.repositories.GenreRepository;
 import ru.krestyankin.library.security.LibraryUserPrincipal;
 import ru.krestyankin.library.service.BookDtoConverter;
+import ru.krestyankin.library.service.BookService;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class BookController {
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
     private final BookDtoConverter bookDtoConverter;
+    private final BookService bookService;
 
     @GetMapping("/")
     public String listPage(Model model) {
@@ -51,7 +53,7 @@ public class BookController {
     }
 
     @GetMapping("/book/add")
-    public String addPage( Model model) {
+    public String addPage(Model model) {
         model.addAttribute("authors", authorRepository.findAll());
         model.addAttribute("genres", genreRepository.findAll());
         return "book/add";
@@ -59,13 +61,13 @@ public class BookController {
 
     @PostMapping("/book/save")
     public String savePage(BookDto bookDto) {
-        bookRepository.save(bookDtoConverter.toDomainObject(bookDto));
+        bookService.save(bookDtoConverter.toDomainObject(bookDto));
         return "book/save";
     }
 
     @GetMapping("/book/delete")
     public String deletePage(@RequestParam("id") String id, Model model) {
-        bookRepository.deleteById(id);
+        bookService.deleteById(id);
         return "book/delete";
     }
 }

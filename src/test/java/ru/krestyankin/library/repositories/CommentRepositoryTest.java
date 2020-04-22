@@ -12,7 +12,7 @@ import ru.krestyankin.library.models.Comment;
 import static org.assertj.core.api.Assertions.assertThat;
 @DataMongoTest
 @EnableConfigurationProperties
-@ComponentScan({"ru.krestyankin.library.config", "ru.krestyankin.library.repositories", "ru.krestyankin.library.event"})
+@ComponentScan({"ru.krestyankin.library.repositories", "ru.krestyankin.library.event"})
 @DisplayName("CommentRepository должен ")
 class CommentRepositoryTest {
     @Autowired
@@ -23,7 +23,9 @@ class CommentRepositoryTest {
     @DisplayName(" добавлять и удалять комментарии")
     @Test
     void shouldCorrectAddComment(){
-        Book book = bookRepository.findAll().get(1);
+        Book book = new Book();
+        book.setTitle("Book");
+        book=bookRepository.save(book);
         Comment comment = new Comment();
         comment.setBook(book);
         comment.setText("Comment text");
@@ -38,7 +40,15 @@ class CommentRepositoryTest {
     @DisplayName(" удалять все комментарии книги")
     @Test
     void shouldCorrectDeleteAllBookComments() {
-        Book book = bookRepository.findAll().get(0);
+        Book book = new Book();
+        book.setTitle("Book");
+        book=bookRepository.save(book);
+        for(int i=0;i<3;i++){
+            Comment comment = new Comment();
+            comment.setBook(book);
+            comment.setText("Comment text");
+            commentRepository.save(comment);
+        }
         commentRepository.deleteAllByBook(book.getId());
         assertThat(commentRepository.getCommentsByBook(book.getId())).hasSize(0);
     }
@@ -46,7 +56,15 @@ class CommentRepositoryTest {
     @DisplayName(" должен корректно получать комментарии книги")
     @Test
     void shouldCorrectFetchBookComment() {
-        Book book = bookRepository.findAll().get(2);
+        Book book = new Book();
+        book.setTitle("Book");
+        book=bookRepository.save(book);
+        for(int i=0;i<3;i++){
+            Comment comment = new Comment();
+            comment.setBook(book);
+            comment.setText("Комментарий "+i);
+            commentRepository.save(comment);
+        }
         assertThat(commentRepository.getCommentsByBook(book.getId())).isNotNull().hasSize(3).
                 allMatch(comment -> comment.getId()!=null && comment.getText().startsWith("Комментарий "));
     }

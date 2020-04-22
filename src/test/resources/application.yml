@@ -1,11 +1,10 @@
 logging:
   level:
-    root: error
+    root: warn
 spring:
   data:
     mongodb:
       database: library
       port: 0
 library:
-  init: true
-
+  init: false
