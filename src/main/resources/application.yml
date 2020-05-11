@@ -1,11 +1,15 @@
 logging:
   level:
-    root: error
+    root: info
+  file:
+    name: library.log
 spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017
       database: library
+    rest:
+      base-path: /datarest
   datasource:
     url: jdbc:h2:mem:testdb
     initialization-mode: always
@@ -21,3 +25,14 @@ spring:
     open-in-view: false
 library:
   init: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
