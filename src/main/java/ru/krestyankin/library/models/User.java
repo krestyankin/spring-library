@@ -3,26 +3,30 @@ package ru.krestyankin.library.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "users")
+@Entity
+@Table(name = "users")
 public class User {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public User(String username, String password) {
+    public User(String username, String password, String roles) {
         this.username = username;
         this.password = password;
+        this.roles = roles;
     }
 
-    @Field(name = "username")
+    @Column(name = "username")
     private String username;
 
-    @Field(name = "passwd")
+    @Column(name = "passwd")
     private String password;
+
+    @Column(name = "roles")
+    private String roles;
 }

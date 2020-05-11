@@ -31,11 +31,11 @@ class CommentControllerTest {
     private AuthorRepository authorRepository;
     @MockBean
     private GenreRepository genreRepository;
-    @MockBean
-    private UserRepository userRepository;
+
 
     @WithMockUser(
-            username = "admin"
+            username = "schoolboy",
+            authorities = {"ROLE_READER"}
     )
     @Test
     void savePage() throws Exception {
@@ -51,7 +51,8 @@ class CommentControllerTest {
     }
 
     @WithMockUser(
-            username = "admin"
+            username = "admin",
+            authorities = {"ROLE_ADMIN"}
     )
     @Test
     void deletePage() throws Exception {

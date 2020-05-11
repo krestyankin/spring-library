@@ -1,10 +1,23 @@
 logging:
   level:
-    root: ERROR
+    root: error
 spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017
       database: library
+  datasource:
+    url: jdbc:h2:mem:testdb
+    initialization-mode: always
+    schema: schema.sql
+    data: data.sql
+  h2:
+    console:
+      enabled: true
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
 library:
   init: true
