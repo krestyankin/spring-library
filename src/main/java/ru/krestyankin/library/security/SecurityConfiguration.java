@@ -14,7 +14,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/error").antMatchers("/h2-console/**");
+        web.ignoring().antMatchers("/error").antMatchers("/h2-console/**").antMatchers("/actuator/**");
     }
 
     @Override
@@ -22,7 +22,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests().antMatchers("/", "/book/view").permitAll()
                 .and()
-                .authorizeRequests().antMatchers( "/*/delete" ,"/*/edit","/book/add").hasRole("ADMIN")
+                .authorizeRequests().antMatchers( "/*/delete" ,"/*/edit","/book/add","/datarest/**").hasRole("ADMIN")
                 .and()
                 .authorizeRequests().antMatchers( "/**" ).authenticated()
                 .and()
