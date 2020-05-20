@@ -6,7 +6,7 @@ logging:
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017
+      uri: ${MONGODB_URI}
       database: library
     rest:
       base-path: /datarest
