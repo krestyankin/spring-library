@@ -1,5 +1,6 @@
 package ru.krestyankin.library.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.acls.domain.BasePermission;
@@ -21,6 +22,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final MutableAclService aclService;
 
+    @HystrixCommand(groupKey = "BookService", commandKey = "bookSave")
     public Book save(Book book){
         final Sid owner = new PrincipalSid(SecurityContextHolder.getContext().getAuthentication());
         final Sid admin = new GrantedAuthoritySid("ROLE_ADMIN");
@@ -37,6 +39,7 @@ public class BookService {
     }
 
     @Secured("ROLE_ADMIN")
+    @HystrixCommand(groupKey = "BookService", commandKey = "bookDeleteById")
     public void deleteById(String bookId) {
         final ObjectIdentity bookIdentity = new ObjectIdentityImpl(Book.class, bookId);
         MutableAcl acl = (MutableAcl) aclService.readAclById(bookIdentity);
@@ -51,5 +54,15 @@ public class BookService {
         }
         bookRepository.deleteById(bookId);
         aclService.deleteAcl(bookIdentity, true);
+    }
+
+    @HystrixCommand(groupKey = "BookService", commandKey = "bookFindById")
+    public Book findById(String bookId){
+        return bookRepository.findById(bookId).orElseThrow(NotFoundException::new);
+    }
+
+    @HystrixCommand(groupKey = "BookService", commandKey = "bookFindAll")
+    public List<Book> findAll(){
+        return bookRepository.findAll();
     }
 }

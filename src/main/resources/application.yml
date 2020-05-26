@@ -36,3 +36,12 @@ management:
   health:
     defaults:
       enabled: true
+hystrix.command.bookFindById.execution.isolation.thread.timeoutInMilliseconds: 1000
+hystrix.command.bookDeleteById.execution.isolation.thread.timeoutInMilliseconds: 1000
+hystrix.command.bookSave.execution.isolation.thread.timeoutInMilliseconds: 1000
+hystrix.command.bookFindAll.execution.isolation.thread.timeoutInMilliseconds: 5000
+hystrix.command.commentSave.execution.isolation.thread.timeoutInMilliseconds: 1000
+hystrix.command.getCommentsByBook.execution.isolation.thread.timeoutInMilliseconds: 1000
+hystrix.command.bookDtoToDomainObject.execution.isolation.thread.timeoutInMilliseconds: 1000
+hystrix:
+  shareSecurityContext: true
