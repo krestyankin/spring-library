@@ -10,18 +10,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.krestyankin.library.models.Book;
 import ru.krestyankin.library.models.BookDto;
 import ru.krestyankin.library.repositories.AuthorRepository;
-import ru.krestyankin.library.repositories.BookRepository;
-import ru.krestyankin.library.repositories.CommentRepository;
 import ru.krestyankin.library.repositories.GenreRepository;
 import ru.krestyankin.library.security.LibraryUserPrincipal;
 import ru.krestyankin.library.service.BookDtoConverter;
 import ru.krestyankin.library.service.BookService;
+import ru.krestyankin.library.service.CommentService;
 
 @Controller
 @RequiredArgsConstructor
 public class BookController {
-    private final BookRepository bookRepository;
-    private final CommentRepository commentRepository;
+    private final CommentService commentService;
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
     private final BookDtoConverter bookDtoConverter;
@@ -29,7 +27,7 @@ public class BookController {
 
     @GetMapping("/")
     public String listPage(Model model) {
-        model.addAttribute("books", bookRepository.findAll());
+        model.addAttribute("books", bookService.findAll());
         LibraryUserPrincipal user = (LibraryUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         model.addAttribute("loggedIn", (user.getUsername()!=null));
         return "book/list";
@@ -37,15 +35,15 @@ public class BookController {
 
     @GetMapping("/book/view")
     public String viewPage(@RequestParam("id") String id, Model model) {
-        Book book = bookRepository.findById(id).orElseThrow(NotFoundException::new);
+        Book book = bookService.findById(id);
         model.addAttribute("book",  book);
-        model.addAttribute("comments", commentRepository.getCommentsByBook(id));
+        model.addAttribute("comments", commentService.getCommentsByBook(id));
         return "book/view";
     }
 
     @GetMapping("/book/edit")
     public String editPage(@RequestParam("id") String id, Model model) {
-        Book book = bookRepository.findById(id).orElseThrow(NotFoundException::new);
+        Book book = bookService.findById(id);
         model.addAttribute("book",  bookDtoConverter.convertToDto(book));
         model.addAttribute("authors", authorRepository.findAll());
         model.addAttribute("genres", genreRepository.findAll());

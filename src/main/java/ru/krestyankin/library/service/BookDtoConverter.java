@@ -1,5 +1,6 @@
 package ru.krestyankin.library.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.krestyankin.library.models.Book;
@@ -23,6 +24,7 @@ public class BookDtoConverter {
             );
     }
 
+    @HystrixCommand(groupKey = "BookDtoConverter", commandKey = "bookDtoToDomainObject")
     public Book toDomainObject(BookDto bookDto) {
         Book book = new Book();
         book.setId(bookDto.getId());

@@ -10,6 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.krestyankin.library.models.Book;
 import ru.krestyankin.library.models.Comment;
 import ru.krestyankin.library.repositories.*;
+import ru.krestyankin.library.service.BookService;
+import ru.krestyankin.library.service.CommentService;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -26,7 +28,11 @@ class CommentControllerTest {
     @MockBean
     private BookRepository bookRepository;
     @MockBean
+    private BookService bookService;
+    @MockBean
     private CommentRepository commentRepository;
+    @MockBean
+    private CommentService commentService;
     @MockBean
     private AuthorRepository authorRepository;
     @MockBean
@@ -40,14 +46,14 @@ class CommentControllerTest {
     @Test
     void savePage() throws Exception {
         Book book = new  Book("book1", "Book title", null, null);
-        given(bookRepository.findById(book.getId())).willReturn(java.util.Optional.of(book));
+        given(bookService.findById(book.getId())).willReturn(book);
         Comment comment = new Comment("Text", book);
         mvc.perform(post("/comment/save")
                 .param("bookId", comment.getBook().getId())
                 .param("text", comment.getText())
                 .with(csrf())
         ).andExpect(status().isOk());
-        Mockito.verify(commentRepository, times(1)).save(comment);
+        Mockito.verify(commentService, times(1)).save(comment);
     }
 
     @WithMockUser(
@@ -57,6 +63,6 @@ class CommentControllerTest {
     @Test
     void deletePage() throws Exception {
         mvc.perform(get("/comment/delete").param("id", "cooment1")).andExpect(status().isOk());
-        Mockito.verify(commentRepository, times(1)).deleteById("cooment1");
+        Mockito.verify(commentService, times(1)).deleteById("cooment1");
     }
 }

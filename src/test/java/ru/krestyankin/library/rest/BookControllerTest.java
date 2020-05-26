@@ -14,6 +14,8 @@ import ru.krestyankin.library.models.Genre;
 import ru.krestyankin.library.repositories.*;
 import ru.krestyankin.library.service.BookDtoConverter;
 import ru.krestyankin.library.service.BookService;
+import ru.krestyankin.library.service.CommentService;
+import ru.krestyankin.library.service.NotFoundException;
 
 import java.util.List;
 
@@ -41,14 +43,15 @@ class BookControllerTest {
     private GenreRepository genreRepository;
     @MockBean
     private BookService bookService;
-
+    @MockBean
+    private CommentService commentService;
 
     private static final List<String> BOOK_TITLES = List.of("Book12345","AnotherBook54321");
     private static final String COMMENT_TEXT = "CommentText12345";
 
     @Test
     void listPage() throws Exception {
-        given(bookRepository.findAll()).willReturn(List.of(new Book("book1", BOOK_TITLES.get(0), null, null),
+        given(bookService.findAll()).willReturn(List.of(new Book("book1", BOOK_TITLES.get(0), null, null),
                 new Book("book2", BOOK_TITLES.get(1), null, null))
         );
         mvc.perform(get("/")).andExpect(status().isOk())
@@ -58,12 +61,13 @@ class BookControllerTest {
 
     @Test
     void viewPage() throws Exception {
-        given(bookRepository.findById("book1"))
-                .willReturn(java.util.Optional.of(new Book("book1", BOOK_TITLES.get(0), null, null)));
-        given(commentRepository.getCommentsByBook("book1")).willReturn(List.of(new Comment(COMMENT_TEXT, null)));
+        given(bookService.findById("book1"))
+                .willReturn(new Book("book1", BOOK_TITLES.get(0), null, null));
+        given(commentService.getCommentsByBook("book1")).willReturn(List.of(new Comment(COMMENT_TEXT, null)));
         mvc.perform(get("/book/view").param("id", "book1")).andExpect(status().isOk())
                 .andExpect(content().string(containsString(BOOK_TITLES.get(0))))
                 .andExpect(content().string(containsString(COMMENT_TEXT)));
+        given(bookService.findById("book2")).willThrow(new NotFoundException());
         mvc.perform(get("/book/view").param("id", "book2")).andExpect(status().isNotFound());
     }
 
@@ -73,8 +77,8 @@ class BookControllerTest {
     )
     @Test
     void editPage() throws Exception {
-        given(bookRepository.findById("book1"))
-                .willReturn(java.util.Optional.of(new Book("book1", BOOK_TITLES.get(0), List.of(new Author()), List.of(new Genre()))));
+        given(bookService.findById("book1"))
+                .willReturn(new Book("book1", BOOK_TITLES.get(0), List.of(new Author()), List.of(new Genre())));
         mvc.perform(get("/book/edit").param("id", "book1")).andExpect(status().isOk())
                 .andExpect(content().string(containsString(BOOK_TITLES.get(0))));
     }
